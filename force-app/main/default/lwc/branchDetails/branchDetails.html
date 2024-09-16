@@ -1,0 +1,26 @@
+<template>
+    <lightning-card title="GitHub Repository Branches">
+        <div class="slds-p-around_medium">
+            <lightning-input label="Repository Name" value={repoName} onchange={handleInputChange}></lightning-input>
+            <lightning-button label="Get Branches" onclick={fetchBranches}></lightning-button>
+
+            <template if:true={branches}>
+                <template for:each={branches} for:item="branch">
+                    <lightning-card key={branch.name} title={branch.name}>
+                        <div class="slds-p-horizontal_small">
+                            <p><strong>Commit SHA:</strong> {branch.commitSha}</p>
+                            <p><a href={branch.commitUrl} target="_blank">View Commit</a></p>
+                            <p><strong>Protected:</strong> {branch.isProtected}</p>
+                        </div>
+                    </lightning-card>
+                </template>
+            </template>
+
+            <template if:true={error}>
+                <div class="slds-text-color_error">
+                    {errorMessage}
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>
