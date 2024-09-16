@@ -5,9 +5,6 @@ public class GitOAuthHandler {
         try {
             // Fetch custom setting values from the organization-wide defaults
             Git_Setup__c gitSetup = Git_Setup__c.getOrgDefaults();
-            System.debug('Client Id: '+ gitSetup.Client_Id__c);
-            System.debug('Client Secret: '+ gitSetup.Client_Secret__c);
-            System.debug('Refresh Token: '+ gitSetup.Refresh_Token__c);
             
             if (gitSetup == null || gitSetup.Client_Id__c == null || gitSetup.Client_Secret__c == null || gitSetup.Refresh_Token__c == null) {
                 throw new CustomException('Missing required fields in Git_Setup__c custom setting.');
@@ -42,8 +39,7 @@ public class GitOAuthHandler {
             if (res.getStatusCode() == 200) {
                 // Parse the URL-encoded response body
                 String responseBody = res.getBody();
-                System.debug('Status Code: '+ res.getStatusCode());
-                System.debug('Response: '+ responseBody);
+                System.debug('Response: ' + responseBody);
                 
                 // Parse the response manually (URL-encoded response)
                 Map<String, String> responseMap = parseUrlEncodedResponse(responseBody);
@@ -52,17 +48,17 @@ public class GitOAuthHandler {
                 String newAccessToken = responseMap.get('access_token');
                 String newRefreshToken = responseMap.get('refresh_token');
                 
-                System.debug('Refresh Token: '+ newRefreshToken);
-                System.debug('New Access Token: '+ newAccessToken);
-                
                 // Handle possible missing fields in response
                 if (newAccessToken == null || newRefreshToken == null) {
                     throw new CustomException('Invalid response: Missing access_token or refresh_token in URL-encoded response.');
                 }
                 
-                // Update the custom setting with the new refresh token
-                gitSetup.Refresh_Token__c = newRefreshToken;
-                update gitSetup;
+                // Only update the custom setting if the refresh token has changed
+                if (gitSetup.Refresh_Token__c != newRefreshToken) {
+                    // Update the custom setting with the new refresh token
+                    gitSetup.Refresh_Token__c = newRefreshToken;
+                    upsert gitSetup; // Use upsert to update the custom setting once.
+                }
                 
                 // Return the new access token
                 return newAccessToken;

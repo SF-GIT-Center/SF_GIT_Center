@@ -39,7 +39,7 @@ public class GitHubService {
                     repo.description = (String) repoMap.get('description');
                     repos.add(repo);
                 }
-                
+                System.debug('Repos: '+ repos);
                 return repos; 
             } else {
                 throw new CustomException('Failed to retrieve repositories. Status Code: ' + res.getStatusCode());

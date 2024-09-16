@@ -1,0 +1,31 @@
+<template>
+    <lightning-card title="GitHub Repositories" icon-name="custom:custom14">
+        
+        <!-- Display repositories if available -->
+        <template if:true={hasRepositories}>
+            <div class="repo-container">
+                <template for:each={repositories} for:item="repo">
+                    <lightning-card key={repo.name} title={repo.name} icon-name="utility:open_folder">
+                        <p class="slds-p-horizontal_small">
+                            <strong>Description:</strong> {repo.description}
+                        </p>
+                        <p class="slds-p-horizontal_small">
+                            <strong>Private:</strong> {repo.privateLabel} <!-- Show private status label -->
+                        </p>
+                    </lightning-card>
+                </template>
+            </div>
+        </template>
+        
+        <!-- Display error message if an error occurs -->
+        <template if:true={error}>
+            <p class="slds-text-color_error">Error: {error.body.message}</p>
+        </template>
+        
+        <!-- Display loading message while repositories are being fetched -->
+        <template if:true={isLoading}>
+            <p>Loading repositories...</p>
+        </template>
+
+    </lightning-card>
+</template>
