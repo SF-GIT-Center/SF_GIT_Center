@@ -104,6 +104,68 @@ public class GitHubService {
             throw new CustomException('Error occurred while creating repository: ' + ex.getMessage());
         }
     }
+
+    @AuraEnabled
+    public static List<GitHubBranch> getRepoBranches(String repoName) {
+        try {
+            // Get the access token from the refreshAccessToken method
+            Git_Setup__c gitSetup = Git_Setup__c.getOrgDefaults();
+            String accessToken = gitSetup.Access_Token__c;
+            System.debug('Access Token: '+ accessToken);
+            
+            // Prepare the GitHub API request
+            String owner = 'SF-GIT-Center'; 
+            String endpoint = 'https://api.github.com/repos/' + owner + '/' + repoName + '/branches';
+            
+            HttpRequest req = new HttpRequest();
+            req.setEndpoint(endpoint);
+            req.setMethod('GET');
+            req.setHeader('Authorization', 'Bearer ' + accessToken);
+            req.setHeader('Accept', 'application/vnd.github.v3+json');
+            
+            // Send the request
+            Http http = new Http();
+            HttpResponse res = http.send(req);
+            
+            // Check for a successful response
+            if (res.getStatusCode() == 200) {
+                List<GitHubBranch> branches = new List<GitHubBranch>();
+                System.debug('Response: ' + res.getBody());
+                
+                // Deserialize the response into a list of branches
+                List<Object> responseList = (List<Object>) JSON.deserializeUntyped(res.getBody());
+                
+                // Iterate through the response and map the branch details
+                for (Object obj : responseList) {
+                    Map<String, Object> branchMap = (Map<String, Object>) obj;
+                    GitHubBranch branch = new GitHubBranch();
+                    branch.name = (String) branchMap.get('name');
+                    
+                    // Extract the commit details
+                    Map<String, Object> commitMap = (Map<String, Object>) branchMap.get('commit');
+                    branch.commitSha = (String) commitMap.get('sha');
+                    branch.commitUrl = (String) commitMap.get('url');
+                    
+                    branch.isProtected = (Boolean) branchMap.get('protected');
+                    branches.add(branch);
+                }
+                
+                return branches; 
+            } else {
+                throw new CustomException('Failed to retrieve branches. Status Code: ' + res.getStatusCode());
+            }
+        } catch (Exception ex) {
+            throw new CustomException('Error occurred while retrieving branches: ' + ex.getMessage());
+        }
+    }
+    
+    // Define a class to store GitHub branch details
+    public class GitHubBranch {
+        @AuraEnabled public String name;
+        @AuraEnabled public String commitSha;
+        @AuraEnabled public String commitUrl;
+        @AuraEnabled public Boolean isProtected;
+    }
     
     // Custom exception class
     public class CustomException extends Exception {}
