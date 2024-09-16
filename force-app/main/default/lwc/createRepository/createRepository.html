@@ -1,0 +1,34 @@
+<template>
+    <lightning-card title="Create GitHub Repository">
+        <div class="slds-p-around_medium">
+            <lightning-input label="Repository Name" value={repoName} onchange={handleInputChange} data-id="repoName"></lightning-input>
+
+            <lightning-textarea label="Description" value={description} onchange={handleInputChange} data-id="description"></lightning-textarea>
+
+            <lightning-input type="checkbox" label="Private" checked={isPrivate} onchange={handleInputChange} data-id="isPrivate"></lightning-input>
+
+            <lightning-input type="checkbox" label="Is Template" checked={isTemplate} onchange={handleInputChange} data-id="isTemplate"></lightning-input>
+
+            <lightning-combobox label="Visibility"
+                                value={visibility}
+                                onchange={handleInputChange}
+                                data-id="visibility"
+                                options={visibilityOptions}>
+            </lightning-combobox>
+
+            <lightning-button class="slds-p-top_small" label="Create Repository" onclick={createRepository}></lightning-button>
+
+            <template if:true={showSuccessMessage}>
+                <div class="slds-text-color_success slds-m-top_medium">
+                    {successMessage}
+                </div>
+            </template>
+
+            <template if:true={error}>
+                <div class="slds-text-color_error slds-m-top_medium">
+                    {errorMessage}
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>

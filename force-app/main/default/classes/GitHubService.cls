@@ -56,6 +56,54 @@ public class GitHubService {
         @AuraEnabled public Boolean isPrivate;
         @AuraEnabled public String description;
     }
+
+    @AuraEnabled
+    public static String createRepository(String name, String description, Boolean isPrivate, Boolean isTemplate, String visibility) {
+        try {
+            // Get the access token from the refreshAccessToken method
+            Git_Setup__c gitSetup = Git_Setup__c.getOrgDefaults();
+            String accessToken = gitSetup.Access_Token__c;
+            System.debug('Access Token: '+ accessToken);
+
+            // Prepare the GitHub API endpoint for creating a new repository
+            String orgName = 'SF-GIT-Center'; 
+            String endpoint = 'https://api.github.com/orgs/' + orgName + '/repos';
+            
+            // Set up the POST request body
+            Map<String, Object> requestBody = new Map<String, Object>{
+                'name' => name,
+                'description' => description,
+                'private' => isPrivate,
+                'is_template' => isTemplate,
+                'visibility' => visibility
+            };
+            
+            // Convert the request body to JSON
+            String requestBodyJson = JSON.serialize(requestBody);
+            
+            // Set up the HTTP request
+            HttpRequest req = new HttpRequest();
+            req.setEndpoint(endpoint);
+            req.setMethod('POST');
+            req.setHeader('Authorization', 'Bearer ' + accessToken);
+            req.setHeader('Content-Type', 'application/json');
+            req.setBody(requestBodyJson);
+
+            // Send the request
+            Http http = new Http();
+            HttpResponse res = http.send(req);
+
+            // Check for a successful response
+            if (res.getStatusCode() == 201) {
+                System.debug('Repository Created Successfully');
+                return 'Repository Created Successfully';
+            } else {
+                throw new CustomException('Failed to create repository. Status Code: ' + res.getStatusCode() + ' Response: ' + res.getBody());
+            }
+        } catch (Exception ex) {
+            throw new CustomException('Error occurred while creating repository: ' + ex.getMessage());
+        }
+    }
     
     // Custom exception class
     public class CustomException extends Exception {}
