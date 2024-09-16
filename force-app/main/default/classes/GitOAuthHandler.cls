@@ -5,19 +5,18 @@ public class GitOAuthHandler {
         try {
             // Fetch custom setting values from the organization-wide defaults
             Git_Setup__c gitSetup = Git_Setup__c.getOrgDefaults();
-            
-            if (gitSetup == null || gitSetup.Client_Id__c == null || gitSetup.Client_Secret__c == null || gitSetup.Refresh_Token__c == null) {
-                throw new CustomException('Missing required fields in Git_Setup__c custom setting.');
-            }
-            
-            // Prepare the request URL
-            String endpoint = 'https://github.com/login/oauth/access_token';
-            
             // Set up the POST body with values from custom settings
             String clientId = gitSetup.Client_Id__c;
             String clientSecret = gitSetup.Client_Secret__c;
             String refreshToken = gitSetup.Refresh_Token__c;
             
+            if (gitSetup == null || clientId == null || clientSecret == null || refreshToken == null) {
+                throw new CustomException('Missing required fields in Git_Setup__c custom setting.');
+            }
+            
+            // Prepare the request URL
+            String endpoint = 'https://github.com/login/oauth/access_token';
+                        
             // Construct the POST body
             String requestBody = 'client_id=' + clientId + 
                 '&client_secret=' + clientSecret + 
@@ -54,9 +53,10 @@ public class GitOAuthHandler {
                 }
                 
                 // Only update the custom setting if the refresh token has changed
-                if (gitSetup.Refresh_Token__c != newRefreshToken) {
+                if (refreshToken != newRefreshToken) {
                     // Update the custom setting with the new refresh token
                     gitSetup.Refresh_Token__c = newRefreshToken;
+                    gitSetup.Access_Token__c = newAccessToken;
                     upsert gitSetup; // Use upsert to update the custom setting once.
                 }
                 

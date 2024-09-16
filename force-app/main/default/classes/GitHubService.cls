@@ -5,7 +5,8 @@ public class GitHubService {
     public static List<GitHubRepository> getOrgRepositories() {
         try {
             // Get the access token from the refreshAccessToken method
-            String accessToken = GitOAuthHandler.refreshAccessToken();
+            Git_Setup__c gitSetup = Git_Setup__c.getOrgDefaults();
+            String accessToken = gitSetup.Access_Token__c;
             System.debug('Access Token: '+ accessToken);
             
             // Prepare the GitHub API request
