@@ -1,5 +1,5 @@
 public class GitHubService {
-    
+
     // Method to get all repositories from a specific organization on GitHub
     @AuraEnabled(cacheable=true)
     public static List<GitHubRepository> getOrgRepositories() {
@@ -7,8 +7,8 @@ public class GitHubService {
             // Get the access token from the refreshAccessToken method
             Git_Setup__c gitSetup = Git_Setup__c.getOrgDefaults();
             String accessToken = gitSetup.Access_Token__c;
-            System.debug('Access Token: '+ accessToken);
-            
+            System.debug('accessToken: '+accessToken);
+
             // Prepare the GitHub API request
             String orgName = 'SF-GIT-Center'; 
             String endpoint = 'https://api.github.com/orgs/' + orgName + '/repos';
@@ -63,8 +63,8 @@ public class GitHubService {
             // Get the access token from the refreshAccessToken method
             Git_Setup__c gitSetup = Git_Setup__c.getOrgDefaults();
             String accessToken = gitSetup.Access_Token__c;
-            System.debug('Access Token: '+ accessToken);
-
+            System.debug('accessToken: '+accessToken);
+            
             // Prepare the GitHub API endpoint for creating a new repository
             String orgName = 'SF-GIT-Center'; 
             String endpoint = 'https://api.github.com/orgs/' + orgName + '/repos';
@@ -107,12 +107,12 @@ public class GitHubService {
 
     @AuraEnabled
     public static List<GitHubBranch> getRepoBranches(String repoName) {
-        try {
-            // Get the access token from the refreshAccessToken method
+        try {  
+             // Get the access token from the refreshAccessToken method
             Git_Setup__c gitSetup = Git_Setup__c.getOrgDefaults();
             String accessToken = gitSetup.Access_Token__c;
-            System.debug('Access Token: '+ accessToken);
-            
+            System.debug('accessToken: '+accessToken);
+                     
             // Prepare the GitHub API request
             String owner = 'SF-GIT-Center'; 
             String endpoint = 'https://api.github.com/repos/' + owner + '/' + repoName + '/branches';
@@ -173,7 +173,7 @@ public class GitHubService {
             // Get the access token from the refreshAccessToken method
             Git_Setup__c gitSetup = Git_Setup__c.getOrgDefaults();
             String accessToken = gitSetup.Access_Token__c;
-            System.debug('Access Token: '+ accessToken);
+            System.debug('accessToken: '+accessToken);
             
             // Prepare the GitHub API request for merging branches
             String owner = 'SF-GIT-Center';
@@ -209,6 +209,40 @@ public class GitHubService {
             }
         } catch (Exception ex) {
             throw new CustomException('Error occurred while merging branches: ' + ex.getMessage());
+        }
+    }
+
+    // listCommits use to list commits of the Repo
+    @AuraEnabled
+    public static List<Object> listCommits(String repoName) {
+        try {
+            // Get the access token from the refreshAccessToken method
+            Git_Setup__c gitSetup = Git_Setup__c.getOrgDefaults();
+            String accessToken = gitSetup.Access_Token__c;
+            System.debug('accessToken: '+accessToken);
+            
+            // Set up the request to GitHub API
+            String owner = 'SF-GIT-Center';
+            String endpoint = 'https://api.github.com/repos/' + owner + '/' + repoName + '/commits';
+            
+            HttpRequest req = new HttpRequest();
+            req.setEndpoint(endpoint);
+            req.setMethod('GET');
+            req.setHeader('Authorization', 'Bearer ' + accessToken);
+            req.setHeader('Accept', 'application/vnd.github.v3+json');
+
+            Http http = new Http();
+            HttpResponse res = http.send(req);
+
+            if (res.getStatusCode() == 200) {
+                List<Object> commitsList = (List<Object>) JSON.deserializeUntyped(res.getBody());
+                return commitsList;
+            } else {
+                throw new CustomException('Error fetching commits. Status Code: ' + res.getStatusCode() + ' Response: ' + res.getBody());
+            }
+
+        } catch (Exception ex) {
+            throw new CustomException('Error: ' + ex.getMessage());
         }
     }
     
