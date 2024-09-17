@@ -166,6 +166,51 @@ public class GitHubService {
         @AuraEnabled public String commitUrl;
         @AuraEnabled public Boolean isProtected;
     }
+
+    @AuraEnabled
+    public static String mergeBranches(String repoName, String base, String head, String commitMessage) {
+        try {
+            // Get the access token from the refreshAccessToken method
+            Git_Setup__c gitSetup = Git_Setup__c.getOrgDefaults();
+            String accessToken = gitSetup.Access_Token__c;
+            System.debug('Access Token: '+ accessToken);
+            
+            // Prepare the GitHub API request for merging branches
+            String owner = 'SF-GIT-Center';
+            String endpoint = 'https://api.github.com/repos/' + owner + '/' + repoName + '/merges';
+            
+            HttpRequest req = new HttpRequest();
+            req.setEndpoint(endpoint);
+            req.setMethod('POST');
+            req.setHeader('Authorization', 'Bearer ' + accessToken);
+            req.setHeader('Accept', 'application/vnd.github.v3+json');
+            req.setHeader('Content-Type', 'application/json');
+            
+            // Create the request body
+            Map<String, Object> requestBody = new Map<String, Object>();
+            requestBody.put('base', base);
+            requestBody.put('head', head);
+            requestBody.put('commit_message', commitMessage);
+            
+            String body = JSON.serialize(requestBody);
+            req.setBody(body);
+            
+            // Send the request
+            Http http = new Http();
+            HttpResponse res = http.send(req);
+            
+            // Check for a successful response
+            if (res.getStatusCode() == 201) {
+                System.debug('Merge successful: ' + res.getBody());
+                return 'Merge successful!';
+            } else {
+                System.debug('Failed to merge branches: ' + res.getBody());
+                throw new CustomException('Failed to merge branches. Status Code: ' + res.getStatusCode() + ' Response: ' + res.getBody());
+            }
+        } catch (Exception ex) {
+            throw new CustomException('Error occurred while merging branches: ' + ex.getMessage());
+        }
+    }
     
     // Custom exception class
     public class CustomException extends Exception {}
