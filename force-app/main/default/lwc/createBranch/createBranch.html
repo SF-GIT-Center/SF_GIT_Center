@@ -1,0 +1,19 @@
+<template>
+    <lightning-card title="Create a New Branch" icon-name="standard:branch">
+        <div class="slds-m-around_medium">
+            <lightning-input label="Repository Name" value={repoName} onchange={handleRepoNameChange}></lightning-input>
+            <lightning-input label="New Branch Name" value={newBranchName} onchange={handleBranchNameChange}></lightning-input>
+            <lightning-input label="SHA" value={sha} onchange={handleShaChange}></lightning-input>
+            
+            <lightning-button label="Create Branch" variant="brand" onclick={createBranch}></lightning-button>
+        </div>
+
+        <template if:true={successMessage}>
+            <p class="slds-text-color_success">{successMessage}</p>
+        </template>
+        
+        <template if:true={errorMessage}>
+            <p class="slds-text-color_error">{errorMessage}</p>
+        </template>
+    </lightning-card>
+</template>
