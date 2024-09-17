@@ -1,0 +1,64 @@
+<template>
+    <lightning-card title="Fetch Commits from Pull Request">
+        <div class="slds-p-around_medium">
+            <!-- Input for Repo Name -->
+            <lightning-input
+                label="Enter Repository Name"
+                value={repoName}
+                onchange={handleRepoNameChange}
+                placeholder="Enter repository name..."
+            ></lightning-input>
+
+            <!-- Input for Pull Request Number -->
+            <lightning-input
+                label="Enter Pull Request Number"
+                value={pullNumber}
+                onchange={handlePullNumberChange}
+                placeholder="Enter pull request number..."
+            ></lightning-input>
+
+            <!-- Button to Fetch Commits -->
+            <lightning-button
+                label="Fetch Commits"
+                onclick={fetchPullRequestCommits}
+                class="slds-m-top_small"
+            ></lightning-button>
+        </div>
+    </lightning-card>
+
+    <!-- Commits Display -->
+    <lightning-card title="Commits" if:true={commits}>
+        <lightning-spinner if:true={isLoading}></lightning-spinner>
+
+        <template if:true={commits}>
+            <template for:each={commits} for:item="commit">
+                <lightning-card key={commit.sha} class="slds-m-around_medium">
+                    <div class="slds-grid slds-wrap">
+                        <!-- Commit Details -->
+                        <div class="slds-col slds-size_1-of-2">
+                            <h3>Message: {commit.commit.message}</h3>
+                            <p>Committer: {commit.commit.committer.name}</p>
+                            <p>Date: {commit.commit.committer.date}</p>
+                            <p><a href={commit.html_url} target="_blank">View Commit</a></p>
+                        </div>
+
+                        <!-- Author Details -->
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-avatar
+                                alternative-text="Avatar"
+                                src={commit.author.avatar_url}
+                                size="medium"
+                            ></lightning-avatar>
+                            <p>Author: {commit.author.login}</p>
+                        </div>
+                    </div>
+                </lightning-card>
+            </template>
+        </template>
+    </lightning-card>
+
+    <!-- Error Handling -->
+    <template if:true={error}>
+        <p class="slds-text-color_error slds-p-around_medium">{error}</p>
+    </template>
+</template>
