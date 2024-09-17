@@ -296,8 +296,10 @@ public class GitHubService {
     @AuraEnabled
     public static List<Map<String, Object>> listPullRequests(String repoName) {
         try {
-            // Get the access token
-            String accessToken = GitOAuthHandler.refreshAccessToken();
+            // Get the access token from the refreshAccessToken method
+            Git_Setup__c gitSetup = Git_Setup__c.getOrgDefaults();
+            String accessToken = gitSetup.Access_Token__c;
+            System.debug('accessToken: '+accessToken);
             
             // Set up the request URL and headers
             String endpoint = 'https://api.github.com/repos/SF-GIT-Center/' + repoName + '/pulls';
@@ -313,8 +315,16 @@ public class GitHubService {
             HttpResponse res = http.send(req);
             
             if (res.getStatusCode() == 200) {
-                // Parse the response body into a list of pull requests
-                List<Map<String, Object>> pullRequests = (List<Map<String, Object>>) JSON.deserializeUntyped(res.getBody());
+                // Deserialize the response into a List<Object>
+                List<Object> rawPullRequests = (List<Object>) JSON.deserializeUntyped(res.getBody());
+                
+                // Convert the List<Object> to List<Map<String, Object>>
+                List<Map<String, Object>> pullRequests = new List<Map<String, Object>>();
+                
+                for (Object obj : rawPullRequests) {
+                    pullRequests.add((Map<String, Object>) obj);
+                }
+                System.debug('pullRequests: '+ pullRequests);
                 return pullRequests;
             } else {
                 throw new CustomException('Failed to retrieve pull requests. Status Code: ' + res.getStatusCode() + ' - ' + res.getBody());
