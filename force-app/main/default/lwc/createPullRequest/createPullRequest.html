@@ -1,0 +1,72 @@
+<template>
+    <lightning-card title="Create Pull Request">
+        <div class="slds-p-around_medium">
+            <!-- Repository Name -->
+            <lightning-input
+                label="Repository Name"
+                value={repoName}
+                onchange={handleRepoNameChange}
+                required
+            ></lightning-input>
+
+            <!-- Title of Pull Request -->
+            <lightning-input
+                label="Title"
+                value={title}
+                onchange={handleTitleChange}
+                required
+            ></lightning-input>
+
+            <!-- Body of Pull Request -->
+            <lightning-textarea
+                label="Body"
+                value={body}
+                onchange={handleBodyChange}
+                required
+            ></lightning-textarea>
+
+            <!-- Head Branch -->
+            <lightning-combobox
+                label="Head Branch"
+                value={headBranch}
+                placeholder="Select a branch"
+                options={branchOptions}
+                onchange={handleHeadBranchChange}
+                required
+            ></lightning-combobox>
+
+            <!-- Base Branch -->
+            <lightning-combobox
+                label="Base Branch"
+                value={baseBranch}
+                placeholder="Select a branch"
+                options={branchOptions}
+                onchange={handleBaseBranchChange}
+                required
+            ></lightning-combobox>
+
+            <!-- Submit Button -->
+            <lightning-button
+                label="Create Pull Request"
+                onclick={handleCreatePullRequest}
+                class="slds-m-top_medium"
+            ></lightning-button>
+
+            <!-- Success Message: Display the Pull Request URL -->
+            <template if:true={pullRequestUrl}>
+                <p class="slds-m-top_medium">
+                    <lightning-formatted-url
+                        value={pullRequestUrl}
+                        label="Click here to view your Pull Request"
+                        target="_blank"
+                    ></lightning-formatted-url>
+                </p>
+            </template>
+
+            <!-- Error Message -->
+            <template if:true={errorMessage}>
+                <p class="slds-text-color_error slds-m-top_medium">{errorMessage}</p>
+            </template>
+        </div>
+    </lightning-card>
+</template>

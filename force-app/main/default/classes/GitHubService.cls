@@ -245,6 +245,52 @@ public class GitHubService {
             throw new CustomException('Error: ' + ex.getMessage());
         }
     }
+
+    // createPullRequest method create Pull Request 
+    @AuraEnabled
+    public static String createPullRequest(String repoName, String title, String body, String head, String base) {
+        try {
+            // Get the access token from the refreshAccessToken method
+            Git_Setup__c gitSetup = Git_Setup__c.getOrgDefaults();
+            String accessToken = gitSetup.Access_Token__c;
+            System.debug('accessToken: '+accessToken);
+            
+            // Set up the request URL and headers
+            String endpoint = 'https://api.github.com/repos/SF-GIT-Center/' + repoName + '/pulls';
+            
+            HttpRequest req = new HttpRequest();
+            req.setEndpoint(endpoint);
+            req.setMethod('POST');
+            req.setHeader('Authorization', 'Bearer ' + accessToken);
+            req.setHeader('Content-Type', 'application/json');
+            
+            // Prepare the request body
+            Map<String, Object> bodyMap = new Map<String, Object>();
+            bodyMap.put('title', title);
+            bodyMap.put('body', body);
+            bodyMap.put('head', head);
+            bodyMap.put('base', base);
+            
+            // Convert request body to JSON
+            req.setBody(JSON.serialize(bodyMap));
+            
+            // Send the request
+            Http http = new Http();
+            HttpResponse res = http.send(req);
+            
+            // Check for successful response
+            if (res.getStatusCode() == 201) {
+                // Parse the response body to extract the Pull Request URL (html_url)
+                Map<String, Object> responseBody = (Map<String, Object>) JSON.deserializeUntyped(res.getBody());
+                String pullRequestUrl = (String) responseBody.get('html_url');
+                return pullRequestUrl;
+            } else {
+                throw new CustomException('Failed to create pull request. Status Code: ' + res.getStatusCode() + ' - ' + res.getBody());
+            }
+        } catch (Exception ex) {
+            throw new CustomException('Error occurred while creating pull request: ' + ex.getMessage());
+        }
+    }
     
     // listPullRequests method use to List Pull Requests
     @AuraEnabled
