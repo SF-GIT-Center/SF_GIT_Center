@@ -280,7 +280,10 @@ public class GitHubService {
             
             // Check for successful response
             if (res.getStatusCode() == 201) {
-                return 'Pull request created successfully.';
+                // Parse the response body to extract the Pull Request URL (html_url)
+                Map<String, Object> responseBody = (Map<String, Object>) JSON.deserializeUntyped(res.getBody());
+                String pullRequestUrl = (String) responseBody.get('html_url');
+                return pullRequestUrl;
             } else {
                 throw new CustomException('Failed to create pull request. Status Code: ' + res.getStatusCode() + ' - ' + res.getBody());
             }
