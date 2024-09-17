@@ -1,0 +1,39 @@
+<template>
+    <lightning-card title="GitHub Commits">
+        <div class="slds-p-around_medium">
+            <lightning-input
+                label="Repository Name"
+                value={repoName}
+                onchange={handleRepoNameChange}
+            ></lightning-input>
+            <lightning-button
+                label="Get Commits"
+                onclick={getCommits}
+                class="slds-m-top_medium"
+            ></lightning-button>
+
+            <template if:true={commits}>
+                <template for:each={commits} for:item="commit" for:index="indexCommit">
+                    <lightning-card key={index} class="slds-m-top_medium">
+                        <div class="slds-box slds-box_border slds-m-around_small">
+                            <p><strong>Commit Message:</strong> {commit.commit.message}</p>
+                            <p><strong>Commit URL:</strong>
+                                <a href={commit.html_url} target="_blank">{commit.html_url}</a>
+                            </p>
+                            <p><strong>Author:</strong> {commit.author.login}</p>
+                            <p><strong>Committer:</strong> {commit.commit.committer.name}</p>
+                            <p><strong>Commit Date:</strong> {commit.commit.committer.date}</p>
+                            <div class="slds-m-top_medium">
+                                <img src={commit.author.avatar_url} alt="Author Avatar" width="50" height="50" />
+                            </div>
+                        </div>
+                    </lightning-card>
+                </template>
+            </template>
+
+            <template if:true={errorMessage}>
+                <p class="slds-text-color_error slds-m-top_medium">{errorMessage}</p>
+            </template>
+        </div>
+    </lightning-card>
+</template>
