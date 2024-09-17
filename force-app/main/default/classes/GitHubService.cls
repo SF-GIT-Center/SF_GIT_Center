@@ -333,6 +333,45 @@ public class GitHubService {
             throw new CustomException('Error occurred while fetching pull requests: ' + ex.getMessage());
         }
     }
+
+    // Method to list commits in a specific pull request
+    @AuraEnabled(cacheable=true)
+    public static List<Map<String, Object>> listPullRequestCommits(String repoName, Integer pullNumber) {
+        // Get the access token from the refreshAccessToken method
+        Git_Setup__c gitSetup = Git_Setup__c.getOrgDefaults();
+        String accessToken = gitSetup.Access_Token__c;
+        System.debug('accessToken: '+accessToken);
+
+        Http http = new Http();
+        HttpRequest request = new HttpRequest();
+        
+        // Prepare the GitHub API endpoint
+        String endPoint = 'https://api.github.com/repos/SF-GIT-Center/' + repoName + '/pulls/' + pullNumber + '/commits';
+        request.setEndpoint(endPoint);
+        request.setMethod('GET');
+        request.setHeader('Authorization', accessToken);
+        request.setHeader('Content-Type', 'application/json');
+        
+        try {
+            HttpResponse response = http.send(request);
+            if (response.getStatusCode() == 200) {
+                // Parse the response body
+                List<Object> commits = (List<Object>) JSON.deserializeUntyped(response.getBody());
+                List<Map<String, Object>> commitList = new List<Map<String, Object>>();
+                
+                for (Object commitObject : commits) {
+                    Map<String, Object> commitMap = (Map<String, Object>) commitObject;
+                    commitList.add(commitMap);
+                }
+                
+                return commitList;
+            } else {
+                throw new AuraHandledException('Error occurred while fetching commits: ' + response.getStatus());
+            }
+        } catch (Exception e) {
+            throw new AuraHandledException('Error fetching commits: ' + e.getMessage());
+        }
+    }
     // Custom exception class
     public class CustomException extends Exception {}
 }
