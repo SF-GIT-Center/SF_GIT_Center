@@ -246,6 +246,37 @@ public class GitHubService {
         }
     }
     
+    // listPullRequests method use to List Pull Requests
+    @AuraEnabled
+    public static List<Map<String, Object>> listPullRequests(String repoName) {
+        try {
+            // Get the access token
+            String accessToken = GitOAuthHandler.refreshAccessToken();
+            
+            // Set up the request URL and headers
+            String endpoint = 'https://api.github.com/repos/SF-GIT-Center/' + repoName + '/pulls';
+            
+            HttpRequest req = new HttpRequest();
+            req.setEndpoint(endpoint);
+            req.setMethod('GET');
+            req.setHeader('Authorization', 'Bearer ' + accessToken);
+            req.setHeader('Content-Type', 'application/json');
+            
+            // Send the request
+            Http http = new Http();
+            HttpResponse res = http.send(req);
+            
+            if (res.getStatusCode() == 200) {
+                // Parse the response body into a list of pull requests
+                List<Map<String, Object>> pullRequests = (List<Map<String, Object>>) JSON.deserializeUntyped(res.getBody());
+                return pullRequests;
+            } else {
+                throw new CustomException('Failed to retrieve pull requests. Status Code: ' + res.getStatusCode() + ' - ' + res.getBody());
+            }
+        } catch (Exception ex) {
+            throw new CustomException('Error occurred while fetching pull requests: ' + ex.getMessage());
+        }
+    }
     // Custom exception class
     public class CustomException extends Exception {}
 }
