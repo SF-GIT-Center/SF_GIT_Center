@@ -375,6 +375,51 @@ public class GitHubService {
             throw new AuraHandledException('Error fetching commits: ' + e.getMessage());
         }
     }
+
+    // createBranch method use to create a branch on GitHub
+    @AuraEnabled
+    public static String createBranch(String repoName, String newBranchName, String sha) {
+        
+        try {
+            // Get the access token from the refreshAccessToken method
+            Git_Setup__c gitSetup = Git_Setup__c.getOrgDefaults();
+            String accessToken = gitSetup.Access_Token__c;
+            System.debug('accessToken: '+accessToken);
+            System.debug('repoName: '+repoName);
+            System.debug('newBranchName: '+newBranchName);
+            System.debug('sha: '+sha);
+
+            Http http = new Http();
+            HttpRequest request = new HttpRequest();
+            
+            // GitHub API endpoint for creating a branch
+            String endPoint = 'https://api.github.com/repos/SF-GIT-Center/' + repoName + '/git/refs';
+            request.setEndpoint(endPoint);
+            request.setMethod('POST');
+            request.setHeader('Authorization', 'Bearer ' + accessToken);
+            request.setHeader('Content-Type', 'application/json');
+            
+            // Create the request body
+            Map<String, Object> requestBody = new Map<String, Object>();
+            requestBody.put('ref', 'refs/heads/' + newBranchName);
+            requestBody.put('sha', sha); 
+            String body = JSON.serialize(requestBody);
+            request.setBody(body);
+
+            HttpResponse response = http.send(request);
+            
+            System.debug('Response Code: '+ response.getStatusCode());
+            // If successful, return success message
+            if (response.getStatusCode() == 201) {
+                System.debug('Response Code: '+ response.getStatusCode());
+                return 'Branch created successfully!';
+            } else {
+                throw new AuraHandledException('Error occurred while creating branch: ' + response.getBody());
+            }
+        } catch (Exception e) {
+            throw new AuraHandledException('Error creating branch: ' + e.getMessage());
+        }
+    }
     // Custom exception class
     public class CustomException extends Exception {}
 }
