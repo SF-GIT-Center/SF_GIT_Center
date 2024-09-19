@@ -420,6 +420,37 @@ public class GitHubService {
             throw new AuraHandledException('Error creating branch: ' + e.getMessage());
         }
     }
+
+    @AuraEnabled
+    public static String getLastCommitSHA(String repo, String branchName) {
+        // Get the access token from the refreshAccessToken method
+        Git_Setup__c gitSetup = Git_Setup__c.getOrgDefaults();
+        String accessToken = gitSetup.Access_Token__c;
+        System.debug('accessToken: '+accessToken);
+
+        Http http = new Http();
+        HttpRequest request = new HttpRequest();
+        String endPoint = 'https://api.github.com/repos/SF-GIT-Center/' + repo + '/branches/' + branchName;
+        request.setEndpoint(endPoint);
+        request.setMethod('GET');
+        request.setHeader('Authorization', 'Bearer ' + accessToken);
+        request.setHeader('Content-Type', 'application/json');
+        
+        try {
+            HttpResponse response = http.send(request);
+            if (response.getStatusCode() == 200) {
+                System.debug('Response Body: '+ response.getBody());
+                Map<String, Object> result = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
+                Map<String, Object> commitWrapper = (Map<String, Object>) result.get('commit');
+                String sha = (String) commitWrapper.get('sha');
+                return sha;
+            } else {
+                throw new AuraHandledException('Error getting last commit SHA: ' + response.getBody());
+            }
+        } catch (Exception e) {
+            throw new AuraHandledException('Error getting last commit SHA: ' + e.getMessage());
+        }
+    }
     // Custom exception class
     public class CustomException extends Exception {}
 }
