@@ -562,7 +562,7 @@ public class GitHubService {
     
     // updateBranchReference method update the reference of the branch
     @AuraEnabled
-    public static String updateBranchReference(String owner, String repo, String branch, String commitSha) {
+    public static String updateBranchReference(String repo, String branch, String commitSha) {
         // Get the access token from the refreshAccessToken method
         Git_Setup__c gitSetup = Git_Setup__c.getOrgDefaults();
         String accessToken = gitSetup.Access_Token__c;
