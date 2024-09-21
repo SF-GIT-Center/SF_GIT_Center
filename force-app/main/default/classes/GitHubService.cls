@@ -523,7 +523,7 @@ public class GitHubService {
 
     // createCommit method create Commit object in GIT
     @AuraEnabled
-    public static String createCommit(String repo, String message, String authorName, String authorEmail, String parentSha, String treeSha) {
+    public static String createCommit(String repo, String message, String parentSha, String treeSha) {
         // Get the access token from the refreshAccessToken method
         Git_Setup__c gitSetup = Git_Setup__c.getOrgDefaults();
         String accessToken = gitSetup.Access_Token__c;
@@ -540,8 +540,8 @@ public class GitHubService {
         Map<String, Object> body = new Map<String, Object>();
         body.put('message', message);
         Map<String, String> author = new Map<String, String>();
-        author.put('name', authorName);
-        author.put('email', authorEmail);
+        author.put('name', 'wphkweerasinghe');
+        author.put('email', 'hkalhara777@gmail.com');
         body.put('author', author);
         body.put('parents', new List<String>{parentSha});
         body.put('tree', treeSha);
