@@ -455,7 +455,7 @@ public class GitHubService {
 
     // method to create blob
     @AuraEnabled
-    public static String createBlob(String repo, String content, String encoding) {
+    public static String createBlob(String repo, String content) {
         // Get the access token from the refreshAccessToken method
         Git_Setup__c gitSetup = Git_Setup__c.getOrgDefaults();
         String accessToken = gitSetup.Access_Token__c;
@@ -471,7 +471,7 @@ public class GitHubService {
         
         Map<String, Object> body = new Map<String, Object>();
         body.put('content', content);
-        body.put('encoding', encoding);
+        body.put('encoding', 'base64');
         
         try {
             request.setBody(JSON.serialize(body));
