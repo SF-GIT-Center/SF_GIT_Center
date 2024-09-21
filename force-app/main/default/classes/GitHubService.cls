@@ -455,7 +455,7 @@ public class GitHubService {
 
     // method to create blob
     @AuraEnabled
-    public static String createBlob(String owner, String repo, String content, String encoding) {
+    public static String createBlob(String repo, String content, String encoding) {
         // Get the access token from the refreshAccessToken method
         Git_Setup__c gitSetup = Git_Setup__c.getOrgDefaults();
         String accessToken = gitSetup.Access_Token__c;
@@ -486,6 +486,40 @@ public class GitHubService {
             throw new AuraHandledException('Error creating blob: ' + e.getMessage());
         }
     }
+
+    @AuraEnabled
+    public static String createTree(String repo, String baseTreeSha, List<Map<String, Object>> tree) {
+        // Get the access token from the refreshAccessToken method
+        Git_Setup__c gitSetup = Git_Setup__c.getOrgDefaults();
+        String accessToken = gitSetup.Access_Token__c;
+        System.debug('accessToken: '+accessToken);
+
+        Http http = new Http();
+        HttpRequest request = new HttpRequest();
+        String endPoint = 'https://api.github.com/repos/SF-GIT-Center/' + repo + '/git/trees';
+        request.setEndpoint(endPoint);
+        request.setMethod('POST');
+        request.setHeader('Authorization', 'Bearer ' + accessToken);
+        request.setHeader('Content-Type', 'application/json');
+        
+        Map<String, Object> body = new Map<String, Object>();
+        body.put('base_tree', baseTreeSha);
+        body.put('tree', tree);
+        
+        try {
+            request.setBody(JSON.serialize(body));
+            HttpResponse response = http.send(request);
+            if (response.getStatusCode() == 201) {
+                Map<String, Object> result = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
+                return (String) result.get('sha');
+            } else {
+                throw new AuraHandledException('Error creating tree: ' + response.getBody());
+            }
+        } catch (Exception e) {
+            throw new AuraHandledException('Error creating tree: ' + e.getMessage());
+        }
+    }
+
     // Custom exception class
     public class CustomException extends Exception {}
 }
