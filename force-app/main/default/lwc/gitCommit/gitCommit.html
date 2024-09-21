@@ -1,10 +1,30 @@
 <template>
-    <lightning-card title="Create Git Commit">
-        <lightning-input label="Repository Name" value={repoName} onchange={handleInputChange} data-id="repoName"></lightning-input>
-        <lightning-input label="Branch Name" value={branchName} onchange={handleInputChange} data-id="branchName"></lightning-input>
-        <lightning-input label="New Branch Name" value={newBranchName} onchange={handleInputChange} data-id="newBranchName"></lightning-input>
-        <lightning-input type="file" label="Select File" onchange={handleFileChange}></lightning-input>
-        
-        <lightning-button label="Create Commit" onclick={createCommit}></lightning-button>
-    </lightning-card>
+    <!-- Step 1: Repo and Branch Name -->
+    <template if:true={isStep1}>
+        <lightning-input label="Repository Name" value={repo} onchange={handleRepoChange}></lightning-input>
+        <lightning-input label="Branch Name" value={branchName} onchange={handleBranchChange}></lightning-input>
+        <lightning-button label="Next" onclick={handleNext}></lightning-button>
+    </template>
+
+    <!-- Step 2: File Upload -->
+    <template if:true={isStep2}>
+        <lightning-input type="file" label="Upload File" onchange={handleFileChange}></lightning-input>
+        <lightning-button label="Next" onclick={handleNext}></lightning-button>
+    </template>
+
+    <!-- Step 3: Commit Message -->
+    <template if:true={isStep4}>
+        <lightning-input label="Commit Message" value={commitMessage} onchange={handleCommitMessageChange}></lightning-input>
+        <lightning-button label="Next" onclick={handleNext}></lightning-button>
+    </template>
+
+    <!-- Step 6: Success or Error Message -->
+    <template if:true={isStep6}>
+        <lightning-formatted-text value={resultMessage}></lightning-formatted-text>
+    </template>
+
+    <!-- Error handling or Result Message -->
+    <template if:true={resultMessage}>
+        <lightning-formatted-text value={resultMessage}></lightning-formatted-text>
+    </template>
 </template>

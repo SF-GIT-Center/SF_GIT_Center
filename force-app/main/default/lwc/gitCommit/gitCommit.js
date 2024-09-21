@@ -1,66 +1,134 @@
 import { LightningElement, track } from 'lwc';
-import getLastCommitSHA from '@salesforce/apex/GitHubCommitController.getLastCommitSHA';
-import createBlob from '@salesforce/apex/GitHubCommitController.createBlob';
-import createTree from '@salesforce/apex/GitHubCommitController.createTree';
-import createCommit from '@salesforce/apex/GitHubCommitController.createCommit';
-import updateBranchReference from '@salesforce/apex/GitHubCommitController.updateBranchReference';
+import getLastCommitSHA from '@salesforce/apex/GitHubService.getLastCommitSHA';
+import createBlob from '@salesforce/apex/GitHubService.createBlob';
+import createTree from '@salesforce/apex/GitHubService.createTree';
+import createCommit from '@salesforce/apex/GitHubService.createCommit';
+import updateBranchReference from '@salesforce/apex/GitHubService.updateBranchReference';
 
-export default class GitCommit extends LightningElement {
-    @track selectedFile;
-    @track fileContentBase64;
-    @track lastCommitSha;
-    @track repoName = '';
+export default class CreateCommit extends LightningElement {
+    @track step = 1;
+    @track repo = '';
     @track branchName = '';
-    @track newBranchName = '';
-    @track sha = '';
-    
+    @track commitMessage = '';
+    @track fileContent = '';
+    @track resultMessage = '';
+
+    repository = '';
+    last_commit_sha = '';
+    base64_blob_sha = '';
+    tree_sha = '';
+    new_commit_sha = '';
+
+    // Step getters for conditional rendering in HTML
+    get isStep1() {
+        return this.step === 1;
+    }
+
+    get isStep2() {
+        return this.step === 2;
+    }
+
+    get isStep3() {
+        return this.step === 3;
+    }
+
+    get isStep4() {
+        return this.step === 4;
+    }
+
+    get isStep5() {
+        return this.step === 5;
+    }
+
+    get isStep6() {
+        return this.step === 6;
+    }
+
+    handleRepoChange(event) {
+        this.repo = event.target.value;
+    }
+
+    handleBranchChange(event) {
+        this.branchName = event.target.value;
+    }
+
     handleFileChange(event) {
         const file = event.target.files[0];
         const reader = new FileReader();
         reader.onload = () => {
-            this.fileContentBase64 = btoa(reader.result); // Convert to base64
+            this.fileContent = reader.result.split(',')[1]; 
         };
-        reader.readAsBinaryString(file); // Read file as binary string
-        this.selectedFile = file.name;
+        reader.readAsDataURL(file);
     }
 
-    async createCommit() {
-        try {
-            const owner = 'SF-GIT-Center'; // Define your owner (organization or username)
-            const repo = this.repoName;
-            const branch = this.branchName;
-            
-            // Step 1: Get the last commit SHA
-            this.lastCommitSha = await getLastCommitSHA({ owner, repo, branchName: branch });
+    handleCommitMessageChange(event) {
+        this.commitMessage = event.target.value;
+    }
 
-            // Step 2: Create the blob with the file content
-            const blobSha = await createBlob({ owner, repo, content: this.fileContentBase64, encoding: 'base64' });
-
-            // Step 3: Create a tree
-            const tree = [{
-                path: `myfolder/${this.selectedFile}`,
-                mode: '100644',
-                type: 'blob',
-                sha: blobSha
-            }];
-            const treeSha = await createTree({ owner, repo, baseTreeSha: this.lastCommitSha, tree });
-
-            // Step 4: Create a commit
-            const message = 'Add new files';
-            const authorName = 'Your Name';
-            const authorEmail = 'your.email@example.com';
-            const newCommitSha = await createCommit({ 
-                owner, repo, message, authorName, authorEmail, parentSha: this.lastCommitSha, treeSha
-            });
-
-            // Step 5: Update the branch reference
-            const result = await updateBranchReference({ owner, repo, branch: this.newBranchName, commitSha: newCommitSha });
-            console.log(result);
-            alert('Commit created successfully!');
-
-        } catch (error) {
-            console.error(error);
-            alert('Error creating commit: ' + error.message);
+    handleNext() {
+        if (this.step === 1) {
+            getLastCommitSHA({ repo: this.repo, branchName: this.branchName })
+                .then(result => {
+                    this.last_commit_sha = result;
+                    this.repository = this.repo;
+                    this.step = 2;
+                })
+                .catch(error => {
+                    this.resultMessage = 'Error fetching last commit: ' + error.body.message;
+                });
+        } else if (this.step === 2) {
+            createBlob({ repo: this.repository, content: this.fileContent })
+                .then(result => {
+                    this.base64_blob_sha = result;
+                    this.step = 3;
+                })
+                .catch(error => {
+                    this.resultMessage = 'Error creating blob: ' + error.body.message;
+                });
+        } else if (this.step === 3) {
+            const tree = [
+                {
+                    path: 'Logos/SF.jpg',
+                    mode: '100644',
+                    type: 'blob',
+                    sha: this.base64_blob_sha
+                }
+            ];
+            createTree({ repo: this.repository, baseTreeSha: this.last_commit_sha, tree: tree })
+                .then(result => {
+                    this.tree_sha = result;
+                    this.step = 4;
+                })
+                .catch(error => {
+                    this.resultMessage = 'Error creating tree: ' + error.body.message;
+                });
+        } else if (this.step === 4) {
+            createCommit({
+                repo: this.repository,
+                message: this.commitMessage,
+                parentSha: this.last_commit_sha,
+                treeSha: this.tree_sha
+            })
+                .then(result => {
+                    this.new_commit_sha = result;
+                    this.step = 5;
+                })
+                .catch(error => {
+                    this.resultMessage = 'Error creating commit: ' + error.body.message;
+                });
+        } else if (this.step === 5) {
+            updateBranchReference({
+                repo: this.repository,
+                branch: 'main',
+                commitSha: this.new_commit_sha
+            })
+                .then(result => {
+                    this.resultMessage = 'Success: ' + result;
+                    this.step = 6;
+                })
+                .catch(error => {
+                    this.resultMessage = 'Error updating branch reference: ' + error.body.message;
+                });
         }
     }
 }
