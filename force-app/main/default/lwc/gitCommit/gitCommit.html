@@ -1,30 +1,46 @@
 <template>
-    <!-- Step 1: Repo and Branch Name -->
-    <template if:true={isStep1}>
-        <lightning-input label="Repository Name" value={repo} onchange={handleRepoChange}></lightning-input>
-        <lightning-input label="Branch Name" value={branchName} onchange={handleBranchChange}></lightning-input>
-        <lightning-button label="Next" onclick={handleNext}></lightning-button>
-    </template>
+    <lightning-card title="Create Git Commit">
+        <div class="slds-m-around_medium">
+            <!-- Step 1: Repo and Branch Name -->
+            <template if:true={isStep1}>
+                <lightning-input label="Repository Name" value={repo} onchange={handleRepoChange}></lightning-input>
+                <lightning-input label="Branch Name" value={branchName} onchange={handleBranchChange}></lightning-input>
+                <lightning-button label="Next" onclick={handleNext}></lightning-button>
+            </template>
 
-    <!-- Step 2: File Upload -->
-    <template if:true={isStep2}>
-        <lightning-input type="file" label="Upload File" onchange={handleFileChange}></lightning-input>
-        <lightning-button label="Next" onclick={handleNext}></lightning-button>
-    </template>
+            <!-- Step 2: File Upload -->
+            <template if:true={isStep2}>
+                <lightning-input type="file" label="Upload File" onchange={handleFileChange}></lightning-input>
+                <lightning-button label="Next" onclick={handleNext}></lightning-button>
+            </template>
 
-    <!-- Step 3: Commit Message -->
-    <template if:true={isStep4}>
-        <lightning-input label="Commit Message" value={commitMessage} onchange={handleCommitMessageChange}></lightning-input>
-        <lightning-button label="Next" onclick={handleNext}></lightning-button>
-    </template>
+            <!-- Step 3: Confirm Blob Creation -->
+            <template if:true={isStep3}>
+                <p>Blob created successfully. Proceed to create a tree structure for the file.</p>
+                <lightning-button label="Next" onclick={handleNext}></lightning-button>  <!-- Add this button -->
+            </template>
 
-    <!-- Step 6: Success or Error Message -->
-    <template if:true={isStep6}>
-        <lightning-formatted-text value={resultMessage}></lightning-formatted-text>
-    </template>
+            <!-- Step 4: Commit Message -->
+            <template if:true={isStep4}>
+                <lightning-input label="Commit Message" value={commitMessage} onchange={handleCommitMessageChange}></lightning-input>
+                <lightning-button label="Next" onclick={handleNext}></lightning-button>
+            </template>
 
-    <!-- Error handling or Result Message -->
-    <template if:true={resultMessage}>
-        <lightning-formatted-text value={resultMessage}></lightning-formatted-text>
-    </template>
+            <!-- Step 5: Confirm Commit Creation -->
+            <template if:true={isStep5}>
+                <p>Commit created successfully. Proceed to update the branch reference.</p>
+                <lightning-button label="Next" onclick={handleNext}></lightning-button>  <!-- Add this button -->
+            </template>
+
+            <!-- Step 6: Success or Error Message -->
+            <template if:true={isStep6}>
+                <lightning-formatted-text value={resultMessage}></lightning-formatted-text>
+            </template>
+
+            <!-- Error handling or Result Message -->
+            <template if:true={resultMessage}>
+                <lightning-formatted-text value={resultMessage}></lightning-formatted-text>
+            </template>
+        </div>
+    </lightning-card>
 </template>

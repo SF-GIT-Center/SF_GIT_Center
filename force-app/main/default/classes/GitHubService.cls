@@ -439,11 +439,13 @@ public class GitHubService {
         
         try {
             HttpResponse response = http.send(request);
+            System.debug('Response getLastCommitSHA: '+ response.getStatusCode() + ': ' + response.getBody() );
             if (response.getStatusCode() == 200) {
                 System.debug('Response Body: '+ response.getBody());
                 Map<String, Object> result = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
                 Map<String, Object> commitWrapper = (Map<String, Object>) result.get('commit');
                 String sha = (String) commitWrapper.get('sha');
+                System.debug('Last Commit sha: '+sha);
                 return sha;
             } else {
                 throw new AuraHandledException('Error getting last commit SHA: ' + response.getBody());
@@ -476,8 +478,10 @@ public class GitHubService {
         try {
             request.setBody(JSON.serialize(body));
             HttpResponse response = http.send(request);
+            System.debug('Response createBlob: '+ response.getStatusCode() + ': ' + response.getBody() );
             if (response.getStatusCode() == 201) {
                 Map<String, Object> result = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
+                System.debug('Blob sha: '+ (String) result.get('sha'));
                 return (String) result.get('sha');
             } else {
                 throw new AuraHandledException('Error creating blob: ' + response.getBody());
@@ -510,8 +514,10 @@ public class GitHubService {
         try {
             request.setBody(JSON.serialize(body));
             HttpResponse response = http.send(request);
+            System.debug('Response createTree: '+ response.getStatusCode() + ': ' + response.getBody() );
             if (response.getStatusCode() == 201) {
                 Map<String, Object> result = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
+                System.debug('Tree sha: '+ (String) result.get('sha'));
                 return (String) result.get('sha');
             } else {
                 throw new AuraHandledException('Error creating tree: ' + response.getBody());
@@ -549,8 +555,10 @@ public class GitHubService {
         try {
             request.setBody(JSON.serialize(body));
             HttpResponse response = http.send(request);
+            System.debug('Response createCommit: '+ response.getStatusCode() + ': ' + response.getBody() );
             if (response.getStatusCode() == 201) {
                 Map<String, Object> result = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
+                System.debug('New commit sha: '+ (String) result.get('sha'));
                 return (String) result.get('sha');
             } else {
                 throw new AuraHandledException('Error creating commit: ' + response.getBody());
@@ -582,7 +590,9 @@ public class GitHubService {
         try {
             request.setBody(JSON.serialize(body));
             HttpResponse response = http.send(request);
+            System.debug('Response updateBranchReference: '+ response.getStatusCode() + ': ' + response.getBody() );
             if (response.getStatusCode() == 200) {
+                System.debug('Branch reference updated successfully: ');
                 return 'Branch reference updated successfully';
             } else {
                 throw new AuraHandledException('Error updating branch reference: ' + response.getBody());
