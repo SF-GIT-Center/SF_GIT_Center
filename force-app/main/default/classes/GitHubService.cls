@@ -487,6 +487,7 @@ public class GitHubService {
         }
     }
 
+    // createTree method create treee structure in GIT
     @AuraEnabled
     public static String createTree(String repo, String baseTreeSha, List<Map<String, Object>> tree) {
         // Get the access token from the refreshAccessToken method
@@ -517,6 +518,77 @@ public class GitHubService {
             }
         } catch (Exception e) {
             throw new AuraHandledException('Error creating tree: ' + e.getMessage());
+        }
+    }
+
+    // createCommit method create Commit object in GIT
+    @AuraEnabled
+    public static String createCommit(String repo, String message, String authorName, String authorEmail, String parentSha, String treeSha) {
+        // Get the access token from the refreshAccessToken method
+        Git_Setup__c gitSetup = Git_Setup__c.getOrgDefaults();
+        String accessToken = gitSetup.Access_Token__c;
+        System.debug('accessToken: '+accessToken);
+
+        Http http = new Http();
+        HttpRequest request = new HttpRequest();
+        String endPoint = 'https://api.github.com/repos/SF-GIT-Center/' + repo + '/git/commits';
+        request.setEndpoint(endPoint);
+        request.setMethod('POST');
+        request.setHeader('Authorization', 'Bearer ' + accessToken);
+        request.setHeader('Content-Type', 'application/json');
+        
+        Map<String, Object> body = new Map<String, Object>();
+        body.put('message', message);
+        Map<String, String> author = new Map<String, String>();
+        author.put('name', authorName);
+        author.put('email', authorEmail);
+        body.put('author', author);
+        body.put('parents', new List<String>{parentSha});
+        body.put('tree', treeSha);
+        
+        try {
+            request.setBody(JSON.serialize(body));
+            HttpResponse response = http.send(request);
+            if (response.getStatusCode() == 201) {
+                Map<String, Object> result = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
+                return (String) result.get('sha');
+            } else {
+                throw new AuraHandledException('Error creating commit: ' + response.getBody());
+            }
+        } catch (Exception e) {
+            throw new AuraHandledException('Error creating commit: ' + e.getMessage());
+        }
+    }
+    
+    // updateBranchReference method update the reference of the branch
+    @AuraEnabled
+    public static String updateBranchReference(String owner, String repo, String branch, String commitSha) {
+        // Get the access token from the refreshAccessToken method
+        Git_Setup__c gitSetup = Git_Setup__c.getOrgDefaults();
+        String accessToken = gitSetup.Access_Token__c;
+        System.debug('accessToken: '+accessToken);
+
+        Http http = new Http();
+        HttpRequest request = new HttpRequest();
+        String endPoint = 'https://api.github.com/repos/SF-GIT-Center/' + repo + '/git/refs/heads/' + branch;
+        request.setEndpoint(endPoint);
+        request.setMethod('PATCH');
+        request.setHeader('Authorization', 'Bearer ' + accessToken);
+        request.setHeader('Content-Type', 'application/json');
+        
+        Map<String, Object> body = new Map<String, Object>();
+        body.put('sha', commitSha);
+        
+        try {
+            request.setBody(JSON.serialize(body));
+            HttpResponse response = http.send(request);
+            if (response.getStatusCode() == 200) {
+                return 'Branch reference updated successfully';
+            } else {
+                throw new AuraHandledException('Error updating branch reference: ' + response.getBody());
+            }
+        } catch (Exception e) {
+            throw new AuraHandledException('Error updating branch reference: ' + e.getMessage());
         }
     }
 
