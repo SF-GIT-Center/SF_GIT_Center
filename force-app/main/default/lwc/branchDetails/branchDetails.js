@@ -11,6 +11,11 @@ export default class BranchDetails extends LightningElement {
         this.repoName = event.target.value;
     }
 
+    clearRecords() {
+        this.repoName = '';
+        this.branches = null;
+    }
+
     async fetchBranches() {
         if (!this.repoName) {
             this.error = true;
