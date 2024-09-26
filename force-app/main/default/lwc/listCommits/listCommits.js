@@ -10,6 +10,11 @@ export default class ListCommits extends LightningElement {
         this.repoName = event.target.value;
     }
 
+    clearCommits() {
+        this.commits = [];
+        this.repoName = '';
+    }
+
     async getCommits() {
         if (!this.repoName) {
             this.errorMessage = 'Please enter a repository name.';
