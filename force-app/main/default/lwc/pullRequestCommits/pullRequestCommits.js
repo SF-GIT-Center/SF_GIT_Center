@@ -40,4 +40,10 @@ export default class PullRequestCommits extends LightningElement {
                 this.isLoading = false;
             });
     }
+
+    clearRecords() {
+        this.repoName = '';
+        this.pullNumber = '';
+        this.commits = null;
+    }
 }

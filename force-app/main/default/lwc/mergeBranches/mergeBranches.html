@@ -33,7 +33,11 @@
                 class="slds-m-bottom_small"
                 required
             ></lightning-textarea>
-
+            <lightning-button
+                label="Clear"
+                onclick={clearRecords}
+                class="slds-m-right_medium"
+            ></lightning-button>
             <lightning-button
                 label="Merge Branches"
                 onclick={mergeBranches}

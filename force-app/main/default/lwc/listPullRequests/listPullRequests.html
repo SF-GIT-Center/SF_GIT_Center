@@ -10,7 +10,16 @@
                 class="slds-m-bottom_small"
                 required
             ></lightning-input>
-            <lightning-button label="Fetch Pull Requests" variant="brand" onclick={fetchPullRequests}></lightning-button>
+            <lightning-button
+                label="Clear"
+                onclick={clearRecords}
+                class="slds-m-right_medium"
+            ></lightning-button>
+            <lightning-button 
+                label="Fetch Pull Requests" 
+                variant="brand" 
+                onclick={fetchPullRequests}
+            ></lightning-button>
         </div>
     </lightning-card>
 

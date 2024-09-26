@@ -64,4 +64,15 @@ export default class CreatePullRequest extends LightningElement {
                 this.pullRequestUrl = '';
             });
     }
+
+    clearRecords() {
+        this.repoName = '';
+        this.title = '';
+        this.body = '';
+        this.headBranch = '';
+        this.baseBranch = '';
+        this.branchOptions = [];
+        this.pullRequestUrl = ''; 
+        this.errorMessage = '';
+    }
 }

@@ -5,14 +5,12 @@ export default class PullRequestList extends LightningElement {
     @track pullRequests;
     @track isLoading = false;
     @track error;
-    repoName = ''; // Dynamically updated based on user input
+    repoName = ''; 
 
-    // Handler for input change
     handleRepoNameChange(event) {
         this.repoName = event.target.value;
     }
 
-    // Fetch pull requests
     fetchPullRequests() {
         if (this.repoName === '') {
             this.error = 'Please enter a repository name';
@@ -32,5 +30,10 @@ export default class PullRequestList extends LightningElement {
                 this.error = 'Error fetching pull requests: ' + error.body.message;
                 this.isLoading = false;
             });
+    }
+
+    clearRecords() {
+        this.pullRequests = null;
+        this.repoName = '';
     }
 }

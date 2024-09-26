@@ -59,4 +59,14 @@ export default class MergeBranches extends LightningElement {
             this.successMessage = '';
         }
     }
+
+    clearRecords() {
+        this.repoName = '';
+        this.baseBranch = '';
+        this.headBranch = '';
+        this.commitMessage = '';
+        this.branchOptions = [];
+        this.successMessage = '';
+        this.errorMessage = '';
+    }
 }

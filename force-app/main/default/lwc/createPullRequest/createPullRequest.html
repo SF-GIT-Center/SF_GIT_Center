@@ -1,31 +1,24 @@
 <template>
     <lightning-card title="Create Pull Request">
         <div class="slds-p-around_medium">
-            <!-- Repository Name -->
             <lightning-input
                 label="Repository Name"
                 value={repoName}
                 onchange={handleRepoNameChange}
                 required
             ></lightning-input>
-
-            <!-- Title of Pull Request -->
             <lightning-input
                 label="Title"
                 value={title}
                 onchange={handleTitleChange}
                 required
             ></lightning-input>
-
-            <!-- Body of Pull Request -->
             <lightning-textarea
                 label="Body"
                 value={body}
                 onchange={handleBodyChange}
                 required
             ></lightning-textarea>
-
-            <!-- Head Branch -->
             <lightning-combobox
                 label="Head Branch"
                 value={headBranch}
@@ -34,8 +27,6 @@
                 onchange={handleHeadBranchChange}
                 required
             ></lightning-combobox>
-
-            <!-- Base Branch -->
             <lightning-combobox
                 label="Base Branch"
                 value={baseBranch}
@@ -45,8 +36,11 @@
                 class="slds-m-bottom_small"
                 required
             ></lightning-combobox>
-
-            <!-- Submit Button -->
+            <lightning-button
+                label="Clear"
+                onclick={clearRecords}
+                class="slds-m-right_medium"
+            ></lightning-button>
             <lightning-button
                 label="Create Pull Request"
                 onclick={handleCreatePullRequest}
