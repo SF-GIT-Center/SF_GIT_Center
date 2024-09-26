@@ -8,25 +8,20 @@ export default class CreateBranch extends LightningElement {
     @track successMessage = '';
     @track errorMessage = '';
 
-    // Handle repository name input
     handleRepoNameChange(event) {
         this.repoName = event.target.value;
     }
 
-    // Handle branch name input
     handleBranchNameChange(event) {
         this.newBranchName = event.target.value;
     }
 
-    // Handle SHA input
     handleShaChange(event) {
         this.sha = event.target.value;
     }
 
-    // Method to create the branch
     createBranch() {
         if (this.repoName && this.newBranchName && this.sha) {
-            // Call Apex method
             createBranch({ repoName: this.repoName, newBranchName: this.newBranchName, sha: this.sha })
                 .then(result => {
                     this.successMessage = result;
@@ -40,5 +35,13 @@ export default class CreateBranch extends LightningElement {
             this.errorMessage = 'Please fill in all fields.';
             this.successMessage = '';
         }
+    }
+
+    clearRecords() {
+        this.repoName = '';
+        this.newBranchName = '';
+        this.sha = '';
+        this.successMessage = '';
+        this.errorMessage = '';
     }
 }
