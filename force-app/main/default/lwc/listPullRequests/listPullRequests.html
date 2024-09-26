@@ -7,8 +7,10 @@
                 value={repoName}
                 onchange={handleRepoNameChange}
                 placeholder="Enter repository name..."
+                class="slds-m-bottom_small"
+                required
             ></lightning-input>
-            <lightning-button label="Fetch Pull Requests" onclick={fetchPullRequests} class="slds-m-top_small"></lightning-button>
+            <lightning-button label="Fetch Pull Requests" variant="brand" onclick={fetchPullRequests}></lightning-button>
         </div>
     </lightning-card>
 

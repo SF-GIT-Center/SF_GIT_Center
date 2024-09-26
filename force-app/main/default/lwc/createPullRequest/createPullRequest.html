@@ -42,6 +42,7 @@
                 placeholder="Select a branch"
                 options={branchOptions}
                 onchange={handleBaseBranchChange}
+                class="slds-m-bottom_small"
                 required
             ></lightning-combobox>
 
@@ -50,6 +51,7 @@
                 label="Create Pull Request"
                 onclick={handleCreatePullRequest}
                 class="slds-m-top_medium"
+                variant="brand"
             ></lightning-button>
 
             <!-- Success Message: Display the Pull Request URL -->

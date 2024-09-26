@@ -7,6 +7,7 @@
                 value={repoName}
                 onchange={handleRepoNameChange}
                 placeholder="Enter repository name..."
+                required
             ></lightning-input>
 
             <!-- Input for Pull Request Number -->
@@ -15,6 +16,8 @@
                 value={pullNumber}
                 onchange={handlePullNumberChange}
                 placeholder="Enter pull request number..."
+                class="slds-m-bottom_small"
+                required
             ></lightning-input>
 
             <!-- Button to Fetch Commits -->
@@ -22,6 +25,7 @@
                 label="Fetch Commits"
                 onclick={fetchPullRequestCommits}
                 class="slds-m-top_small"
+                variant="brand"
             ></lightning-button>
         </div>
     </lightning-card>

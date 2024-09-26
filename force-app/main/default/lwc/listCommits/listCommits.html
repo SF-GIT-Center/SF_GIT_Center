@@ -5,11 +5,14 @@
                 label="Repository Name"
                 value={repoName}
                 onchange={handleRepoNameChange}
+                class="slds-m-bottom_small"
+                required
             ></lightning-input>
             <lightning-button
                 label="Get Commits"
                 onclick={getCommits}
                 class="slds-m-top_medium"
+                variant="brand"
             ></lightning-button>
 
             <template if:true={commits}>

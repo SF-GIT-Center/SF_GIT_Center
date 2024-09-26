@@ -1,8 +1,18 @@
 <template>
     <lightning-card title="GitHub Repository Branches">
         <div class="slds-p-around_medium">
-            <lightning-input label="Repository Name" value={repoName} onchange={handleInputChange}></lightning-input>
-            <lightning-button label="Get Branches" onclick={fetchBranches}></lightning-button>
+            <lightning-input 
+                label="Repository Name" 
+                value={repoName} 
+                onchange={handleInputChange} 
+                class="slds-m-bottom_small" 
+                required>
+            </lightning-input>
+            <lightning-button 
+                label="Get Branches" 
+                variant="brand" 
+                onclick={fetchBranches}>
+            </lightning-button>
 
             <template if:true={branches}>
                 <template for:each={branches} for:item="branch">

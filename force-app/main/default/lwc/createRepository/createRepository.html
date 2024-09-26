@@ -1,22 +1,50 @@
 <template>
     <lightning-card title="Create GitHub Repository">
         <div class="slds-p-around_medium">
-            <lightning-input label="Repository Name" value={repoName} onchange={handleInputChange} data-id="repoName"></lightning-input>
+            <lightning-input 
+                label="Repository Name" 
+                value={repoName} 
+                onchange={handleInputChange} 
+                data-id="repoName"
+                required>
+            </lightning-input>
+            <lightning-textarea 
+                label="Description" 
+                value={description} 
+                onchange={handleInputChange} 
+                data-id="description"
+                required>
+            </lightning-textarea>
+            <lightning-input 
+                type="checkbox" 
+                label="Private" 
+                checked={isPrivate} 
+                onchange={handleInputChange} 
+                data-id="isPrivate">
+            </lightning-input>
+            <lightning-input 
+                type="checkbox" 
+                label="Is Template" 
+                checked={isTemplate} 
+                onchange={handleInputChange} 
+                data-id="isTemplate">
+            </lightning-input>
 
-            <lightning-textarea label="Description" value={description} onchange={handleInputChange} data-id="description"></lightning-textarea>
-
-            <lightning-input type="checkbox" label="Private" checked={isPrivate} onchange={handleInputChange} data-id="isPrivate"></lightning-input>
-
-            <lightning-input type="checkbox" label="Is Template" checked={isTemplate} onchange={handleInputChange} data-id="isTemplate"></lightning-input>
-
-            <lightning-combobox label="Visibility"
-                                value={visibility}
-                                onchange={handleInputChange}
-                                data-id="visibility"
-                                options={visibilityOptions}>
+            <lightning-combobox 
+                label="Visibility"
+                value={visibility}
+                onchange={handleInputChange}
+                data-id="visibility"
+                options={visibilityOptions}
+                class="slds-m-bottom_small"
+                required>
             </lightning-combobox>
-
-            <lightning-button class="slds-p-top_small" label="Create Repository" onclick={createRepository}></lightning-button>
+            <lightning-button 
+                class="slds-m-top_small" 
+                label="Create Repository" 
+                variant="brand" 
+                onclick={createRepository}>
+            </lightning-button>
 
             <template if:true={showSuccessMessage}>
                 <div class="slds-text-color_success slds-m-top_medium">
