@@ -33,6 +33,14 @@ export default class CreateRepository extends LightningElement {
         }
     }
 
+    clearRecords() {
+        this.repoName = '';
+        this.description = '';
+        this.isPrivate = false;
+        this.isTemplate = false;
+        this.visibility = 'public';
+    }
+
     async createRepository() {
         this.showSuccessMessage = false;
         this.error = false;
